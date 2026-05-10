@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>妈妈，谢谢你相信我｜王鸿</title>
+
+  <!-- Leaflet / OpenStreetMap -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+  </script>
+
+  <style>
+    :root {
+      --bg: #fff7f2;
+      --card: rgba(255, 255, 255, 0.82);
+      --text: #2a1a16;
+      --muted: #8b6f66;
+      --pink: #ff7aa8;
+      --rose: #ff4f87;
+      --orange: #ffad66;
+      --cream: #fffaf6;
+      --line: rgba(255, 122, 168, 0.28);
+      --shadow: 0 20px 60px rgba(92, 45, 45, 0.16);
+      --radius: 28px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang SC",
+        "Hiragino Sans GB",
+        "Microsoft YaHei",
+        sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255, 196, 214, 0.75), transparent 28rem),
+        radial-gradient(circle at 90% 15%, rgba(255, 196, 124, 0.55), transparent 22rem),
+        linear-gradient(180deg, #fff1f5 0%, #fff7f2 42%, #fffaf7 100%);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .noise {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.06;
+      background-image:
+        linear-gradient(45deg, rgba(0,0,0,.08) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(0,0,0,.08) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(0,0,0,.08) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(0,0,0,.08) 75%);
+      background-size: 18px 18px;
+      background-position: 0 0, 0 9px, 9px -9px, -9px 0px;
+      z-index: 0;
+    }
+
+    .floating-hearts {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      color: rgba(255, 79, 135, 0.22);
+      font-size: 18px;
+      animation: floatUp linear infinite;
+    }
+
+    .heart:nth-child(1) { left: 8%; bottom: -5%; animation-duration: 13s; animation-delay: 0s; }
+    .heart:nth-child(2) { left: 22%; bottom: -8%; animation-duration: 17s; animation-delay: 2s; }
+    .heart:nth-child(3) { left: 48%; bottom: -4%; animation-duration: 14s; animation-delay: 4s; }
+    .heart:nth-child(4) { left: 70%; bottom: -7%; animation-duration: 18s; animation-delay: 1s; }
+    .heart:nth-child(5) { left: 88%; bottom: -9%; animation-duration: 15s; animation-delay: 5s; }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.9);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-115vh) rotate(30deg) scale(1.35);
+        opacity: 0;
+      }
+    }
+
+    header,
+    main,
+    footer {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px 26px;
+    }
+
+    .hero-card {
+      width: min(100%, 920px);
+      padding: 34px 22px 24px;
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.62));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: rgba(255, 122, 168, 0.2);
+      right: -80px;
+      top: -70px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: rgba(255, 122, 168, 0.13);
+      color: #9b3558;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      margin: 24px 0 14px;
+      font-size: clamp(38px, 12vw, 82px);
+      line-height: 0.98;
+      letter-spacing: -2.8px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #ff4f87 0%, #e85b3f 48%, #ffad66 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #5d423a;
+      font-size: 17px;
+      line-height: 1.85;
+      font-weight: 500;
+    }
+
+    .subtitle strong {
+      color: #d83f73;
+    }
+
+    .signature {
+      margin-top: 26px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 250, 246, 0.78);
+      border: 1px solid rgba(255, 171, 102, 0.28);
+    }
+
+    .signature p {
+      margin: 0;
+      color: #6b4a41;
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .signature .name {
+      margin-top: 12px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #2a1a16;
+    }
+
+    .scroll-tip {
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .scroll-tip a {
+      color: #d83f73;
+      text-decoration: none;
+      font-weight: 800;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 122, 168, 0.12);
+    }
+
+    section {
+      padding: 26px 16px;
+    }
+
+    .section-inner {
+      width: min(100%, 980px);
+      margin: 0 auto;
+    }
+
+    .section-title {
+      margin-bottom: 18px;
+    }
+
+    .section-title .eyebrow {
+      margin: 0 0 8px;
+      color: #d83f73;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(26px, 8vw, 46px);
+      letter-spacing: -1.4px;
+      line-height: 1.08;
+    }
+
+    .section-title p {
+      margin: 12px 0 0;
+      color: #6f554d;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .map-wrap {
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: white;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    #map {
+      width: 100%;
+      height: 58vh;
+      min-height: 430px;
+      max-height: 620px;
+    }
+
+    .map-note {
+      padding: 14px 16px 16px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+      background: rgba(255, 250, 246, 0.94);
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 21px;
+      top: 18px;
+      bottom: 18px;
+      width: 2px;
+      background: linear-gradient(180deg, transparent, var(--line), var(--line), transparent);
+    }
+
+    .moment {
+      position: relative;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #ff7aa8, #ffad66);
+      color: white;
+      box-shadow: 0 12px 25px rgba(255, 79, 135, 0.28);
+      font-weight: 900;
+      font-size: 13px;
+      z-index: 2;
+    }
+
+    .moment-card {
+      padding: 18px 17px;
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: 0 14px 38px rgba(92, 45, 45, 0.11);
+      border: 1px solid rgba(255,255,255,0.75);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .moment-card:active {
+      transform: scale(0.985);
+    }
+
+    .moment-card.active {
+      border-color: rgba(255, 79, 135, 0.65);
+      box-shadow: 0 18px 48px rgba(255, 79, 135, 0.18);
+    }
+
+    .year {
+      display: inline-flex;
+      margin-bottom: 8px;
+      color: #d83f73;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+    }
+
+    .moment-card h3 {
+      margin: 0 0 9px;
+      font-size: 20px;
+      letter-spacing: -0.4px;
+    }
+
+    .moment-card p {
+      margin: 0;
+      color: #644a42;
+      line-height: 1.75;
+      font-size: 15px;
+    }
+
+    .place {
+      margin-top: 13px;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(255, 122, 168, 0.1);
+      color: #8d3c58;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 700;
+    }
+
+    .letter {
+      margin-top: 26px;
+      padding: 24px 20px;
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.68)),
+        radial-gradient(circle at 100% 0%, rgba(255, 122, 168, 0.15), transparent 18rem);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.82);
+    }
+
+    .letter h2 {
+      margin: 0 0 16px;
+      font-size: 26px;
+      letter-spacing: -0.8px;
+    }
+
+    .letter p {
+      margin: 0 0 14px;
+      color: #4f3832;
+      line-height: 1.95;
+      font-size: 16px;
+    }
+
+    .letter p:last-child {
+      margin-bottom: 0;
+    }
+
+    .quote {
+      margin: 22px 0 0;
+      padding: 19px 18px;
+      border-left: 5px solid var(--rose);
+      border-radius: 18px;
+      background: rgba(255, 122, 168, 0.11);
+      color: #7a344d;
+      font-weight: 800;
+      line-height: 1.85;
+    }
+
+    .flower-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 18px;
+      z-index: 5;
+      border: none;
+      color: white;
+      background: linear-gradient(135deg, #ff4f87, #ffad66);
+      box-shadow: 0 18px 35px rgba(255, 79, 135, 0.32);
+      border-radius: 999px;
+      padding: 13px 16px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .flower-pop {
+      position: fixed;
+      right: 28px;
+      bottom: 70px;
+      z-index: 6;
+      font-size: 34px;
+      pointer-events: none;
+      animation: bloom 1.45s ease forwards;
+    }
+
+    @keyframes bloom {
+      0% {
+        transform: translateY(12px) scale(0.4) rotate(-8deg);
+        opacity: 0;
+      }
+      25% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-115px) scale(1.5) rotate(12deg);
+        opacity: 0;
+      }
+    }
+
+    footer {
+      padding: 24px 18px 96px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .leaflet-popup-content-wrapper {
+      border-radius: 18px;
+    }
+
+    .popup-title {
+      font-weight: 900;
+      color: #d83f73;
+      margin-bottom: 4px;
+    }
+
+    .popup-text {
+      color: #5c463f;
+      line-height: 1.55;
+    }
+
+    @media (min-width: 800px) {
+      .hero-card {
+        padding: 54px 56px 42px;
+      }
+
+      .subtitle {
+        font-size: 20px;
+        max-width: 760px;
+      }
+
+      section {
+        padding: 44px 22px;
+      }
+
+      .timeline {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px;
+      }
+
+      .timeline::before {
+        display: none;
+      }
+
+      .moment {
+        grid-template-columns: 1fr;
+      }
+
+      .dot {
+        width: auto;
+        height: auto;
+        justify-self: start;
+        padding: 8px 13px;
+        border-radius: 999px;
+      }
+
+      .letter {
+        padding: 42px 48px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .hero {
+        padding: 22px 13px;
+      }
+
+      .hero-card {
+        border-radius: 30px;
+        padding: 30px 18px 22px;
+      }
+
+      h1 {
+        letter-spacing: -2.2px;
+      }
+
+      .subtitle {
+        font-size: 16px;
+      }
+
+      #map {
+        height: 56vh;
+        min-height: 390px;
+      }
+
+      .moment-card h3 {
+        font-size: 19px;
+      }
+
+      .flower-btn {
+        right: 12px;
+        bottom: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="noise"></div>
+
+    <div class="floating-hearts" aria-hidden="true">
+      <span class="heart">❤</span>
+      <span class="heart">❤</span>
+      <span class="heart">❤</span>
+      <span class="heart">❤</span>
+      <span class="heart">❤</span>
+    </div>
+
+    <header class="hero">
+      <div class="hero-card">
+        <div class="badge">🌷 母亲节快乐 · From 王鸿</div>
+
+        <h1>
+          妈妈，<br />
+          <span class="gradient-text">谢谢你相信我。</span>
+        </h1>
+
+        <p class="subtitle">
+          这不是一张简单的贺卡。<br />
+          这是从 <strong>2006 年</strong> 到现在，我想送给你的一条路：
+          有我出生的地方，有我读书的地方，也有每一次不够完美之后，
+          你仍然坚定站在我身后的地方。
+        </p>
+
+        <div class="signature">
+          <p>
+            我的人生并不是每一次都赢。<br />
+            但我最幸运的是，每一次我回头，都能看见你还在。
+          </p>
+          <div class="name">—— 王鸿</div>
+        </div>
+
+        <div class="scroll-tip">
+          <span>往下看，一起走完这条地图上的时间线</span>
+          <a href="#map-section">开始</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="map-section">
+        <div class="section-inner">
+          <div class="section-title">
+            <p class="eyebrow">A map of love</p>
+            <h2>这条路，是你陪我走出来的。</h2>
+            <p>
+              从四川遂宁，到成都，再到马来西亚。地图上的每一个点，
+              都不是简单的地点，而是你一次又一次把我托起来的证明。
+            </p>
+          </div>
+
+          <div class="map-wrap">
+            <div id="map"></div>
+            <div class="map-note">
+              地图使用 OpenStreetMap。国内地点坐标为近似标注，主要用于叙事展示；如果想更精准，可以在代码中的
+              <strong>journeyPoints</strong> 里修改经纬度。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-inner">
+          <div class="section-title">
+            <p class="eyebrow">Timeline</p>
+            <h2>从出生，到远方。</h2>
+            <p>
+              点击每一张卡片，地图会跳到那个时间点。
+            </p>
+          </div>
+
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-inner">
+          <div class="letter">
+            <h2>妈妈，我想对你说</h2>
+
+            <p>
+              2006 年，你把我带到这个世界上。那时候我什么都不懂，
+              但你已经开始为我承担很多很多。
+            </p>
+
+            <p>
+              2012 年，我开始上小学。我的世界从家慢慢变大，
+              你也开始陪我经历作业、考试、成长，还有那些我当时不懂的操心。
+            </p>
+
+            <p>
+              2018 年，是我人生里第一次觉得“命运要被考试决定”的时候。
+              我想考成绵的高中，你没有把我的梦想当成小孩子的冲动。
+              你支持我，鼓励我，最后我考上了师大一中龙泉校区。
+            </p>
+
+            <p>
+              2021 年，第二次大考并不尽如人意。我没有去到自己最想去的地方，
+              只读上了成都温江东辰外国语学校。可是你没有用失败定义我，
+              你只是继续陪我往前走。
+            </p>
+
+            <p>
+              2024 年，高考失利。我知道那不是一个让人轻松接受的结果。
+              但你还是相信我，还是愿意把未来交到我手里，
+              把我送到了马来西亚亚太科技大学。
+            </p>
+
+            <div class="quote">
+              妈妈，谢谢你。<br />
+              谢谢你在我不够耀眼的时候，依旧相信我会有光。
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <button class="flower-btn" id="flowerBtn">送妈妈一朵花 🌸</button>
+
+    <footer>
+      母亲节快乐。<br />
+      愿以后的每一次远行，都能成为让你放心的答案。<br />
+      Made with love by 王鸿.
+    </footer>
+  </div>
+
+  <script>
+    const journeyPoints = [
+      {
+        year: "2006",
+        title: "我来到这个世界",
+        place: "四川省遂宁市船山区妇幼保健院",
+        lat: 30.5088,
+        lng: 105.5735,
+        story:
+          "2006 年，你把我带到这个世界上。从那一刻开始，我的人生就有了第一个坐标：妈妈在的地方。",
+      },
+      {
+        year: "2012",
+        title: "我开始上小学",
+        place: "四川省遂宁市紫竹路 · 遂州外国语小学",
+        lat: 30.5219,
+        lng: 105.6137,
+        story:
+          "2012 年，我上小学了。那是我第一次真正走向自己的世界，而你一直在我身后，替我整理书包，也整理我的勇气。",
+      },
+      {
+        year: "2018",
+        title: "第一次决定命运的考试",
+        place: "成都市龙泉驿区 · 师大一中龙泉校区",
+        lat: 30.5992,
+        lng: 104.3136,
+        story:
+          "2018 年，我想考成绵的高中。你支持我、相信我，最后我考上了师大一中龙泉校区。那一次，我知道梦想被家人认真对待，是很幸福的事。",
+      },
+      {
+        year: "2021",
+        title: "第二次大考，不尽如人意",
+        place: "成都市温江区 · 成都温江东辰外国语学校",
+        lat: 30.6946,
+        lng: 103.8375,
+        story:
+          "2021 年，第二次大考并没有那么理想。我只读上了成都温江东辰外国语学校，但你没有责怪我，也没有放弃我。",
+      },
+      {
+        year: "2024",
+        title: "高考失利，但你依旧相信我",
+        place: "马来西亚 · Asia Pacific University of Technology & Innovation",
+        lat: 3.0556,
+        lng: 101.7009,
+        story:
+          "2024 年，高考失利。可是你依旧坚定地相信我，把我送到了马来西亚亚太科技大学。那一刻我明白，失败不是终点，因为你还愿意陪我重新开始。",
+      },
+    ];
+
+    const map = L.map("map", {
+      zoomControl: false,
+      scrollWheelZoom: false,
+    });
+
+    L.control.zoom({
+      position: "bottomright",
+    }).addTo(map);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors',
+    }).addTo(map);
+
+    const bounds = L.latLngBounds(journeyPoints.map(point => [point.lat, point.lng]));
+    map.fitBounds(bounds, {
+      padding: [42, 42],
+    });
+
+    const line = L.polyline(
+      journeyPoints.map(point => [point.lat, point.lng]),
+      {
+        color: "#ff4f87",
+        weight: 4,
+        opacity: 0.82,
+        dashArray: "8, 10",
+      }
+    ).addTo(map);
+
+    const markers = [];
+
+    const heartIcon = L.divIcon({
+      html: `<div style="
+        width:34px;
+        height:34px;
+        border-radius:50%;
+        display:grid;
+        place-items:center;
+        background:linear-gradient(135deg,#ff4f87,#ffad66);
+        color:white;
+        box-shadow:0 12px 28px rgba(255,79,135,.35);
+        border:3px solid rgba(255,255,255,.9);
+        font-size:16px;
+      ">❤</div>`,
+      className: "",
+      iconSize: [34, 34],
+      iconAnchor: [17, 17],
+    });
+
+    journeyPoints.forEach((point, index) => {
+      const marker = L.marker([point.lat, point.lng], {
+        icon: heartIcon,
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div class="popup-title">${point.year} · ${point.title}</div>
+        <div class="popup-text">
+          <strong>${point.place}</strong><br />
+          ${point.story}
+        </div>
+      `);
+
+      markers.push(marker);
+    });
+
+    const timeline = document.getElementById("timeline");
+
+    journeyPoints.forEach((point, index) => {
+      const item = document.createElement("article");
+      item.className = "moment";
+      item.innerHTML = `
+        <div class="dot">${point.year}</div>
+        <div class="moment-card" data-index="${index}">
+          <span class="year">${point.year}</span>
+          <h3>${point.title}</h3>
+          <p>${point.story}</p>
+          <div class="place">📍 ${point.place}</div>
+        </div>
+      `;
+
+      timeline.appendChild(item);
+    });
+
+    const cards = document.querySelectorAll(".moment-card");
+
+    function focusPoint(index) {
+      const point = journeyPoints[index];
+
+      cards.forEach(card => card.classList.remove("active"));
+      cards[index].classList.add("active");
+
+      map.flyTo([point.lat, point.lng], index === 4 ? 7 : 13, {
+        duration: 1.1,
+      });
+
+      setTimeout(() => {
+        markers[index].openPopup();
+      }, 800);
+    }
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        const index = Number(card.dataset.index);
+        focusPoint(index);
+        document.getElementById("map-section").scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
+    });
+
+    setTimeout(() => {
+      focusPoint(0);
+    }, 700);
+
+    const flowerBtn = document.getElementById("flowerBtn");
+
+    flowerBtn.addEventListener("click", () => {
+      const flowers = ["🌸", "🌷", "🌹", "💐", "🌺"];
+      const flower = document.createElement("div");
+      flower.className = "flower-pop";
+      flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+      flower.style.right = `${18 + Math.random() * 80}px`;
+      document.body.appendChild(flower);
+
+      setTimeout(() => {
+        flower.remove();
+      }, 1500);
+    });
+  </script>
+</body>
+</html>
