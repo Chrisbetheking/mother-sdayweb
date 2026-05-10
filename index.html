@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>妈妈，谢谢你相信我｜王鸿</title>
 
-  <!-- Leaflet / OpenStreetMap -->
+  <!-- OpenStreetMap / Leaflet -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -16,16 +16,20 @@
 
   <style>
     :root {
-      --bg: #fff7f2;
-      --card: rgba(255, 255, 255, 0.82);
-      --text: #2a1a16;
-      --muted: #8b6f66;
-      --pink: #ff7aa8;
+      --bg: #fff7f5;
+      --paper: rgba(255, 255, 255, 0.86);
+      --paper-solid: #ffffff;
+      --text: #2d1b18;
+      --muted: #7c625b;
       --rose: #ff4f87;
+      --rose-deep: #d9346e;
+      --rose-light: #ffe7ef;
       --orange: #ffad66;
-      --cream: #fffaf6;
-      --line: rgba(255, 122, 168, 0.28);
-      --shadow: 0 20px 60px rgba(92, 45, 45, 0.16);
+      --green: #7ea66a;
+      --wood: #b97855;
+      --line: rgba(185, 120, 85, 0.48);
+      --shadow: 0 22px 70px rgba(111, 50, 50, 0.16);
+      --soft-shadow: 0 14px 40px rgba(111, 50, 50, 0.11);
       --radius: 28px;
     }
 
@@ -40,6 +44,7 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -50,34 +55,30 @@
         sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 20% 0%, rgba(255, 196, 214, 0.75), transparent 28rem),
-        radial-gradient(circle at 90% 15%, rgba(255, 196, 124, 0.55), transparent 22rem),
-        linear-gradient(180deg, #fff1f5 0%, #fff7f2 42%, #fffaf7 100%);
+        radial-gradient(circle at 18% 0%, rgba(255, 183, 206, 0.7), transparent 28rem),
+        radial-gradient(circle at 92% 18%, rgba(255, 194, 128, 0.5), transparent 23rem),
+        radial-gradient(circle at 48% 70%, rgba(255, 231, 239, 0.9), transparent 28rem),
+        linear-gradient(180deg, #fff2f6 0%, #fff8f3 48%, #fffaf7 100%);
       overflow-x: hidden;
     }
 
-    .page {
-      width: 100%;
-      min-height: 100vh;
-      position: relative;
-    }
-
-    .noise {
-      pointer-events: none;
+    body::before {
+      content: "";
       position: fixed;
       inset: 0;
-      opacity: 0.06;
+      pointer-events: none;
       background-image:
-        linear-gradient(45deg, rgba(0,0,0,.08) 25%, transparent 25%),
-        linear-gradient(-45deg, rgba(0,0,0,.08) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, rgba(0,0,0,.08) 75%),
-        linear-gradient(-45deg, transparent 75%, rgba(0,0,0,.08) 75%);
-      background-size: 18px 18px;
-      background-position: 0 0, 0 9px, 9px -9px, -9px 0px;
+        linear-gradient(45deg, rgba(255, 122, 168, 0.05) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255, 122, 168, 0.05) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255, 122, 168, 0.05) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255, 122, 168, 0.05) 75%);
+      background-size: 22px 22px;
+      background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+      opacity: 0.75;
       z-index: 0;
     }
 
-    .floating-hearts {
+    .rose-rain {
       position: fixed;
       inset: 0;
       pointer-events: none;
@@ -85,89 +86,87 @@
       overflow: hidden;
     }
 
-    .heart {
+    .rose-fall {
       position: absolute;
-      color: rgba(255, 79, 135, 0.22);
-      font-size: 18px;
-      animation: floatUp linear infinite;
+      top: -12vh;
+      font-size: 22px;
+      opacity: 0.75;
+      animation-name: fallRose;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      filter: drop-shadow(0 8px 10px rgba(255, 79, 135, 0.14));
     }
 
-    .heart:nth-child(1) { left: 8%; bottom: -5%; animation-duration: 13s; animation-delay: 0s; }
-    .heart:nth-child(2) { left: 22%; bottom: -8%; animation-duration: 17s; animation-delay: 2s; }
-    .heart:nth-child(3) { left: 48%; bottom: -4%; animation-duration: 14s; animation-delay: 4s; }
-    .heart:nth-child(4) { left: 70%; bottom: -7%; animation-duration: 18s; animation-delay: 1s; }
-    .heart:nth-child(5) { left: 88%; bottom: -9%; animation-duration: 15s; animation-delay: 5s; }
-
-    @keyframes floatUp {
+    @keyframes fallRose {
       0% {
-        transform: translateY(0) rotate(0deg) scale(0.9);
+        transform: translate3d(0, -10vh, 0) rotate(0deg);
         opacity: 0;
       }
+
       10% {
-        opacity: 1;
+        opacity: 0.78;
       }
+
       100% {
-        transform: translateY(-115vh) rotate(30deg) scale(1.35);
+        transform: translate3d(var(--drift), 118vh, 0) rotate(360deg);
         opacity: 0;
       }
     }
 
-    header,
-    main,
-    footer {
+    .page {
       position: relative;
       z-index: 2;
     }
 
     .hero {
       min-height: 100svh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 18px 26px;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px 34px;
     }
 
     .hero-card {
-      width: min(100%, 920px);
-      padding: 34px 22px 24px;
-      border-radius: 34px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,255,255,0.62));
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.78);
+      width: min(100%, 980px);
       position: relative;
       overflow: hidden;
+      padding: 34px 22px 26px;
+      border-radius: 36px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.66)),
+        radial-gradient(circle at 100% 0%, rgba(255, 122, 168, 0.18), transparent 16rem);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.8);
+      backdrop-filter: blur(18px);
     }
 
-    .hero-card::before {
-      content: "";
+    .hero-card::after {
+      content: "🌹";
       position: absolute;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: rgba(255, 122, 168, 0.2);
-      right: -80px;
-      top: -70px;
+      right: 18px;
+      top: 14px;
+      font-size: 74px;
+      opacity: 0.12;
+      transform: rotate(18deg);
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 9px 13px;
+      padding: 9px 14px;
       border-radius: 999px;
-      background: rgba(255, 122, 168, 0.13);
-      color: #9b3558;
+      background: rgba(255, 79, 135, 0.12);
+      color: #a7335e;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 900;
       letter-spacing: 0.5px;
     }
 
     h1 {
-      margin: 24px 0 14px;
-      font-size: clamp(38px, 12vw, 82px);
+      margin: 24px 0 16px;
+      font-size: clamp(40px, 12vw, 88px);
       line-height: 0.98;
-      letter-spacing: -2.8px;
+      letter-spacing: -3px;
     }
 
     .gradient-text {
@@ -177,295 +176,441 @@
       color: transparent;
     }
 
-    .subtitle {
+    .hero-text {
       margin: 0;
-      color: #5d423a;
-      font-size: 17px;
-      line-height: 1.85;
-      font-weight: 500;
+      color: #5b413b;
+      font-size: 16.5px;
+      line-height: 1.9;
+      font-weight: 520;
     }
 
-    .subtitle strong {
-      color: #d83f73;
+    .hero-text strong {
+      color: var(--rose-deep);
+      font-weight: 900;
     }
 
-    .signature {
-      margin-top: 26px;
+    .hero-note {
+      margin-top: 22px;
       padding: 18px;
       border-radius: 24px;
-      background: rgba(255, 250, 246, 0.78);
-      border: 1px solid rgba(255, 171, 102, 0.28);
-    }
-
-    .signature p {
-      margin: 0;
-      color: #6b4a41;
-      line-height: 1.8;
+      background: rgba(255, 248, 245, 0.84);
+      border: 1px solid rgba(255, 173, 102, 0.28);
+      color: #604741;
+      line-height: 1.85;
       font-size: 15px;
     }
 
-    .signature .name {
-      margin-top: 12px;
-      font-size: 18px;
-      font-weight: 900;
-      color: #2a1a16;
+    .hero-note b {
+      color: #2d1b18;
     }
 
-    .scroll-tip {
+    .hero-actions {
       margin-top: 24px;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-wrap: wrap;
       gap: 12px;
-      color: var(--muted);
-      font-size: 13px;
+      align-items: center;
     }
 
-    .scroll-tip a {
-      color: #d83f73;
+    .hero-actions a,
+    .hero-actions button {
+      border: none;
       text-decoration: none;
-      font-weight: 800;
-      padding: 10px 14px;
+      cursor: pointer;
+      padding: 13px 16px;
       border-radius: 999px;
-      background: rgba(255, 122, 168, 0.12);
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .primary-link {
+      color: white;
+      background: linear-gradient(135deg, var(--rose), var(--orange));
+      box-shadow: 0 16px 34px rgba(255, 79, 135, 0.26);
+    }
+
+    .ghost-btn {
+      color: #a7335e;
+      background: rgba(255, 79, 135, 0.1);
     }
 
     section {
-      padding: 26px 16px;
+      padding: 28px 16px;
     }
 
     .section-inner {
-      width: min(100%, 980px);
+      width: min(100%, 1040px);
       margin: 0 auto;
     }
 
     .section-title {
-      margin-bottom: 18px;
+      margin-bottom: 24px;
     }
 
-    .section-title .eyebrow {
+    .eyebrow {
       margin: 0 0 8px;
-      color: #d83f73;
-      font-weight: 900;
+      color: var(--rose-deep);
       font-size: 13px;
-      letter-spacing: 1px;
+      font-weight: 950;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
     }
 
     .section-title h2 {
       margin: 0;
-      font-size: clamp(26px, 8vw, 46px);
-      letter-spacing: -1.4px;
+      font-size: clamp(28px, 8vw, 48px);
       line-height: 1.08;
+      letter-spacing: -1.6px;
     }
 
     .section-title p {
-      margin: 12px 0 0;
-      color: #6f554d;
-      line-height: 1.75;
+      margin: 13px 0 0;
+      color: var(--muted);
       font-size: 15px;
+      line-height: 1.85;
     }
 
-    .map-wrap {
-      border-radius: var(--radius);
+    .route-map-card {
       overflow: hidden;
-      box-shadow: var(--shadow);
+      border-radius: 30px;
       background: white;
-      border: 1px solid rgba(255,255,255,0.8);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.78);
     }
 
-    #map {
+    #mainMap {
       width: 100%;
-      height: 58vh;
-      min-height: 430px;
-      max-height: 620px;
+      height: 56vh;
+      min-height: 390px;
+      max-height: 610px;
+      background: #f6efe9;
     }
 
-    .map-note {
+    .map-caption {
       padding: 14px 16px 16px;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
-      background: rgba(255, 250, 246, 0.94);
+      font-size: 12.5px;
+      line-height: 1.75;
+      background: rgba(255, 248, 245, 0.96);
     }
 
-    .timeline {
+    .tree {
       position: relative;
-      display: grid;
-      gap: 18px;
-      margin-top: 22px;
+      padding: 20px 0 8px;
     }
 
-    .timeline::before {
+    .tree::before {
       content: "";
       position: absolute;
-      left: 21px;
-      top: 18px;
-      bottom: 18px;
-      width: 2px;
-      background: linear-gradient(180deg, transparent, var(--line), var(--line), transparent);
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 9px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg,
+          rgba(185, 120, 85, 0.05),
+          rgba(185, 120, 85, 0.55),
+          rgba(126, 166, 106, 0.5));
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.38),
+        0 18px 50px rgba(185, 120, 85, 0.14);
     }
 
-    .moment {
+    .branch {
       position: relative;
       display: grid;
-      grid-template-columns: 46px 1fr;
-      gap: 12px;
-      align-items: start;
+      grid-template-columns: 1fr 78px 1fr;
+      align-items: center;
+      min-height: 260px;
+      margin: 12px 0 36px;
     }
 
-    .dot {
-      width: 44px;
-      height: 44px;
+    .branch::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(185,120,85,0.08), rgba(185,120,85,0.52));
+      transform: translateY(-50%);
+      z-index: 0;
+    }
+
+    .branch.left::before {
+      left: calc(50% - 300px);
+      right: 50%;
+    }
+
+    .branch.right::before {
+      left: 50%;
+      right: calc(50% - 300px);
+      background: linear-gradient(90deg, rgba(185,120,85,0.52), rgba(185,120,85,0.08));
+    }
+
+    .branch-node {
+      grid-column: 2;
+      justify-self: center;
+      z-index: 2;
+      width: 62px;
+      height: 62px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, #ff7aa8, #ffad66);
       color: white;
-      box-shadow: 0 12px 25px rgba(255, 79, 135, 0.28);
-      font-weight: 900;
       font-size: 13px;
-      z-index: 2;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--rose), var(--orange));
+      box-shadow: 0 15px 32px rgba(255, 79, 135, 0.28);
+      border: 5px solid rgba(255,255,255,0.88);
     }
 
-    .moment-card {
-      padding: 18px 17px;
-      border-radius: 24px;
-      background: var(--card);
-      box-shadow: 0 14px 38px rgba(92, 45, 45, 0.11);
-      border: 1px solid rgba(255,255,255,0.75);
-      backdrop-filter: blur(12px);
-      cursor: pointer;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    .branch-card {
+      z-index: 1;
+      overflow: hidden;
+      border-radius: 30px;
+      background: var(--paper);
+      box-shadow: var(--soft-shadow);
+      border: 1px solid rgba(255,255,255,0.82);
+      backdrop-filter: blur(14px);
+      transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
     }
 
-    .moment-card:active {
-      transform: scale(0.985);
+    .branch-card:active {
+      transform: scale(0.99);
     }
 
-    .moment-card.active {
-      border-color: rgba(255, 79, 135, 0.65);
-      box-shadow: 0 18px 48px rgba(255, 79, 135, 0.18);
+    .branch-card.active {
+      border-color: rgba(255, 79, 135, 0.72);
+      box-shadow: 0 20px 58px rgba(255, 79, 135, 0.18);
     }
 
-    .year {
+    .branch.left .branch-card {
+      grid-column: 1;
+    }
+
+    .branch.right .branch-card {
+      grid-column: 3;
+    }
+
+    .card-content {
+      padding: 19px 18px 16px;
+    }
+
+    .year-tag {
       display: inline-flex;
       margin-bottom: 8px;
-      color: #d83f73;
+      color: var(--rose-deep);
+      font-weight: 950;
       font-size: 13px;
-      font-weight: 900;
       letter-spacing: 0.6px;
     }
 
-    .moment-card h3 {
-      margin: 0 0 9px;
-      font-size: 20px;
-      letter-spacing: -0.4px;
+    .branch-card h3 {
+      margin: 0 0 10px;
+      font-size: 21px;
+      line-height: 1.25;
+      letter-spacing: -0.5px;
     }
 
-    .moment-card p {
+    .branch-card p {
       margin: 0;
-      color: #644a42;
-      line-height: 1.75;
-      font-size: 15px;
+      color: #604942;
+      line-height: 1.82;
+      font-size: 14.8px;
     }
 
     .place {
       margin-top: 13px;
       padding: 11px 12px;
-      border-radius: 16px;
-      background: rgba(255, 122, 168, 0.1);
-      color: #8d3c58;
+      border-radius: 17px;
+      color: #8b3558;
+      background: rgba(255, 79, 135, 0.1);
       font-size: 13px;
+      font-weight: 850;
       line-height: 1.55;
-      font-weight: 700;
+    }
+
+    .mini-map {
+      width: 100%;
+      height: 190px;
+      background: #f6efe9;
+      border-top: 1px solid rgba(255, 122, 168, 0.12);
+    }
+
+    .now-card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.72)),
+        radial-gradient(circle at 100% 0%, rgba(126, 166, 106, 0.18), transparent 14rem);
     }
 
     .letter {
-      margin-top: 26px;
-      padding: 24px 20px;
-      border-radius: 30px;
+      margin-top: 8px;
+      padding: 26px 20px;
+      border-radius: 32px;
       background:
-        linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.68)),
-        radial-gradient(circle at 100% 0%, rgba(255, 122, 168, 0.15), transparent 18rem);
+        linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.68)),
+        radial-gradient(circle at 100% 0%, rgba(255, 122, 168, 0.16), transparent 18rem);
       box-shadow: var(--shadow);
       border: 1px solid rgba(255,255,255,0.82);
     }
 
     .letter h2 {
-      margin: 0 0 16px;
-      font-size: 26px;
+      margin: 0 0 15px;
+      font-size: 28px;
+      line-height: 1.18;
       letter-spacing: -0.8px;
     }
 
     .letter p {
-      margin: 0 0 14px;
+      margin: 0 0 15px;
       color: #4f3832;
       line-height: 1.95;
       font-size: 16px;
     }
 
-    .letter p:last-child {
-      margin-bottom: 0;
-    }
-
-    .quote {
-      margin: 22px 0 0;
+    .letter .promise {
+      margin-top: 21px;
       padding: 19px 18px;
       border-left: 5px solid var(--rose);
-      border-radius: 18px;
-      background: rgba(255, 122, 168, 0.11);
-      color: #7a344d;
-      font-weight: 800;
-      line-height: 1.85;
+      border-radius: 20px;
+      background: rgba(255, 79, 135, 0.1);
+      color: #7e3450;
+      font-weight: 900;
+      line-height: 1.9;
     }
 
     .flower-btn {
       position: fixed;
       right: 16px;
       bottom: 18px;
-      z-index: 5;
+      z-index: 20;
       border: none;
       color: white;
-      background: linear-gradient(135deg, #ff4f87, #ffad66);
-      box-shadow: 0 18px 35px rgba(255, 79, 135, 0.32);
+      background: linear-gradient(135deg, var(--rose), var(--orange));
+      box-shadow: 0 18px 36px rgba(255, 79, 135, 0.34);
       border-radius: 999px;
       padding: 13px 16px;
       font-size: 14px;
-      font-weight: 900;
+      font-weight: 950;
       cursor: pointer;
     }
 
     .flower-pop {
       position: fixed;
-      right: 28px;
-      bottom: 70px;
-      z-index: 6;
-      font-size: 34px;
+      z-index: 25;
+      font-size: 36px;
       pointer-events: none;
-      animation: bloom 1.45s ease forwards;
+      animation: bloom 1.5s ease forwards;
     }
 
     @keyframes bloom {
       0% {
-        transform: translateY(12px) scale(0.4) rotate(-8deg);
+        transform: translateY(14px) scale(0.35) rotate(-8deg);
         opacity: 0;
       }
+
       25% {
         opacity: 1;
       }
+
       100% {
-        transform: translateY(-115px) scale(1.5) rotate(12deg);
+        transform: translateY(-130px) scale(1.65) rotate(14deg);
         opacity: 0;
       }
     }
 
+    .love-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(45, 27, 24, 0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .love-modal.show {
+      display: flex;
+    }
+
+    .love-box {
+      width: min(100%, 430px);
+      position: relative;
+      padding: 30px 22px 24px;
+      border-radius: 34px;
+      text-align: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,250,0.94)),
+        radial-gradient(circle at 50% 0%, rgba(255, 79, 135, 0.16), transparent 16rem);
+      box-shadow: 0 28px 90px rgba(80, 30, 40, 0.28);
+      border: 1px solid rgba(255,255,255,0.9);
+      animation: modalIn 0.28s ease both;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .love-box .big {
+      font-size: 54px;
+      margin-bottom: 10px;
+    }
+
+    .love-box h2 {
+      margin: 0 0 12px;
+      font-size: 34px;
+      letter-spacing: -1px;
+      color: var(--rose-deep);
+    }
+
+    .love-box p {
+      margin: 0;
+      color: #5d423a;
+      line-height: 1.85;
+      font-size: 15.5px;
+    }
+
+    .close-modal {
+      margin-top: 20px;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      color: white;
+      font-weight: 950;
+      background: linear-gradient(135deg, var(--rose), var(--orange));
+      cursor: pointer;
+    }
+
     footer {
-      padding: 24px 18px 96px;
+      position: relative;
+      z-index: 2;
+      padding: 28px 18px 96px;
       text-align: center;
       color: var(--muted);
       font-size: 13px;
-      line-height: 1.8;
+      line-height: 1.85;
+    }
+
+    .leaflet-container {
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        "PingFang SC",
+        "Microsoft YaHei",
+        sans-serif;
     }
 
     .leaflet-popup-content-wrapper {
@@ -473,81 +618,116 @@
     }
 
     .popup-title {
-      font-weight: 900;
-      color: #d83f73;
-      margin-bottom: 4px;
+      font-weight: 950;
+      color: var(--rose-deep);
+      margin-bottom: 5px;
     }
 
     .popup-text {
-      color: #5c463f;
-      line-height: 1.55;
+      color: #5d453f;
+      line-height: 1.58;
     }
 
-    @media (min-width: 800px) {
+    @media (min-width: 820px) {
       .hero-card {
-        padding: 54px 56px 42px;
+        padding: 58px 58px 44px;
       }
 
-      .subtitle {
+      .hero-text {
+        max-width: 780px;
         font-size: 20px;
+      }
+
+      .hero-note {
         max-width: 760px;
+        font-size: 16px;
       }
 
       section {
-        padding: 44px 22px;
-      }
-
-      .timeline {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px;
-      }
-
-      .timeline::before {
-        display: none;
-      }
-
-      .moment {
-        grid-template-columns: 1fr;
-      }
-
-      .dot {
-        width: auto;
-        height: auto;
-        justify-self: start;
-        padding: 8px 13px;
-        border-radius: 999px;
+        padding: 46px 22px;
       }
 
       .letter {
-        padding: 42px 48px;
+        padding: 44px 50px;
       }
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 760px) {
       .hero {
-        padding: 22px 13px;
+        padding: 22px 13px 28px;
       }
 
       .hero-card {
         border-radius: 30px;
-        padding: 30px 18px 22px;
+        padding: 30px 18px 23px;
       }
 
       h1 {
-        letter-spacing: -2.2px;
+        letter-spacing: -2.3px;
       }
 
-      .subtitle {
+      .hero-text {
         font-size: 16px;
       }
 
-      #map {
-        height: 56vh;
-        min-height: 390px;
+      #mainMap {
+        height: 52vh;
+        min-height: 360px;
       }
 
-      .moment-card h3 {
-        font-size: 19px;
+      .tree {
+        padding-left: 4px;
+      }
+
+      .tree::before {
+        left: 26px;
+        width: 7px;
+      }
+
+      .branch {
+        grid-template-columns: 58px 1fr;
+        gap: 12px;
+        min-height: unset;
+        margin: 0 0 26px;
+        align-items: start;
+      }
+
+      .branch::before {
+        top: 31px;
+        left: 27px !important;
+        right: auto !important;
+        width: 52px;
+        height: 4px;
+        transform: none;
+        background: linear-gradient(90deg, rgba(185,120,85,0.52), rgba(185,120,85,0.08)) !important;
+      }
+
+      .branch-node {
+        grid-column: 1;
+        width: 54px;
+        height: 54px;
+        font-size: 12px;
+      }
+
+      .branch.left .branch-card,
+      .branch.right .branch-card {
+        grid-column: 2;
+      }
+
+      .branch-card {
+        border-radius: 26px;
+      }
+
+      .card-content {
+        padding: 18px 16px 15px;
+      }
+
+      .branch-card h3 {
+        font-size: 20px;
+      }
+
+      .mini-map {
+        height: 172px;
       }
 
       .flower-btn {
@@ -555,137 +735,182 @@
         bottom: 14px;
       }
     }
+
+    @media (max-width: 390px) {
+      .hero-card {
+        padding: 28px 16px 22px;
+      }
+
+      .section-title h2 {
+        font-size: 27px;
+      }
+
+      .branch {
+        grid-template-columns: 52px 1fr;
+        gap: 10px;
+      }
+
+      .branch-node {
+        width: 50px;
+        height: 50px;
+      }
+
+      .tree::before {
+        left: 24px;
+      }
+
+      .branch::before {
+        left: 24px !important;
+        width: 48px;
+      }
+
+      .mini-map {
+        height: 158px;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div class="rose-rain" id="roseRain" aria-hidden="true"></div>
+
   <div class="page">
-    <div class="noise"></div>
-
-    <div class="floating-hearts" aria-hidden="true">
-      <span class="heart">❤</span>
-      <span class="heart">❤</span>
-      <span class="heart">❤</span>
-      <span class="heart">❤</span>
-      <span class="heart">❤</span>
-    </div>
-
     <header class="hero">
       <div class="hero-card">
-        <div class="badge">🌷 母亲节快乐 · From 王鸿</div>
+        <div class="badge">🌹 母亲节快乐 · 王鸿写给妈妈</div>
 
         <h1>
           妈妈，<br />
-          <span class="gradient-text">谢谢你相信我。</span>
+          <span class="gradient-text">谢谢你一直相信我。</span>
         </h1>
 
-        <p class="subtitle">
-          这不是一张简单的贺卡。<br />
-          这是从 <strong>2006 年</strong> 到现在，我想送给你的一条路：
-          有我出生的地方，有我读书的地方，也有每一次不够完美之后，
-          你仍然坚定站在我身后的地方。
+        <p class="hero-text">
+          这不是一张普通的贺卡。<br />
+          这是我把自己的人生做成一棵树：根在 <strong>2006 年</strong>，
+          枝叶一路往下长，穿过小学、中考、高中、高考、远方，
+          也穿过每一次不够完美之后，你仍然没有放弃我的时刻。
         </p>
 
-        <div class="signature">
-          <p>
-            我的人生并不是每一次都赢。<br />
-            但我最幸运的是，每一次我回头，都能看见你还在。
-          </p>
-          <div class="name">—— 王鸿</div>
+        <div class="hero-note">
+          <b>我不是每一次都赢。</b><br />
+          可我最幸运的是，每一次我失利、怀疑自己、重新开始的时候，
+          你都还站在我身后。
         </div>
 
-        <div class="scroll-tip">
-          <span>往下看，一起走完这条地图上的时间线</span>
-          <a href="#map-section">开始</a>
+        <div class="hero-actions">
+          <a class="primary-link" href="#tree-section">看这棵成长树</a>
+          <button class="ghost-btn" id="secretHint" type="button">点屏幕三下有惊喜</button>
         </div>
       </div>
     </header>
 
     <main>
-      <section id="map-section">
+      <section>
         <div class="section-inner">
           <div class="section-title">
-            <p class="eyebrow">A map of love</p>
-            <h2>这条路，是你陪我走出来的。</h2>
+            <p class="eyebrow">OpenStreetMap Route</p>
+            <h2>从遂宁，到成都，再到马来西亚。</h2>
             <p>
-              从四川遂宁，到成都，再到马来西亚。地图上的每一个点，
-              都不是简单的地点，而是你一次又一次把我托起来的证明。
+              地图上的每一个点，都是我人生的一段路；而每一段路背后，
+              都有一个始终相信我的妈妈。
             </p>
           </div>
 
-          <div class="map-wrap">
-            <div id="map"></div>
-            <div class="map-note">
-              地图使用 OpenStreetMap。国内地点坐标为近似标注，主要用于叙事展示；如果想更精准，可以在代码中的
-              <strong>journeyPoints</strong> 里修改经纬度。
+          <div class="route-map-card">
+            <div id="mainMap"></div>
+            <div class="map-caption">
+              地图使用 OpenStreetMap。页面里的国内坐标是根据地点做的近似标注，主要用于叙事展示。
+              你之后想更精准，可以在代码的 <strong>journeyPoints</strong> 里改经纬度。
             </div>
           </div>
         </div>
       </section>
 
-      <section>
+      <section id="tree-section">
         <div class="section-inner">
           <div class="section-title">
-            <p class="eyebrow">Timeline</p>
-            <h2>从出生，到远方。</h2>
+            <p class="eyebrow">A growing tree</p>
+            <h2>这棵树，是你陪我长大的证明。</h2>
             <p>
-              点击每一张卡片，地图会跳到那个时间点。
+              往下走，就是从过去走到现在。每一根枝丫旁边都有地图，
+              因为这些地方都真实地装着我们的故事。
             </p>
           </div>
 
-          <div class="timeline" id="timeline"></div>
+          <div class="tree" id="tree"></div>
         </div>
       </section>
 
       <section>
         <div class="section-inner">
           <div class="letter">
-            <h2>妈妈，我想对你说</h2>
+            <h2>妈妈，我想把这些话认真说给你听</h2>
 
             <p>
-              2006 年，你把我带到这个世界上。那时候我什么都不懂，
-              但你已经开始为我承担很多很多。
+              2006 年，你把我带到这个世界上。从那一天开始，
+              我的生命里就有了第一个坐标：你在的地方。
             </p>
 
             <p>
-              2012 年，我开始上小学。我的世界从家慢慢变大，
-              你也开始陪我经历作业、考试、成长，还有那些我当时不懂的操心。
+              2012 年，我开始上小学。那时候我还不知道成长意味着什么，
+              只知道每天上学、放学、写作业。但现在回头看，那些普通的日子里，
+              其实都是你在一点点把我托起来。
             </p>
 
             <p>
-              2018 年，是我人生里第一次觉得“命运要被考试决定”的时候。
-              我想考成绵的高中，你没有把我的梦想当成小孩子的冲动。
-              你支持我，鼓励我，最后我考上了师大一中龙泉校区。
+              2018 年，第一次真正像“决定命运”的考试来了。
+              我想考成绵的高中，你没有否定我，也没有觉得我想太多。
+              你支持我，我也真的考上了师大一中龙泉校区。
             </p>
 
             <p>
-              2021 年，第二次大考并不尽如人意。我没有去到自己最想去的地方，
-              只读上了成都温江东辰外国语学校。可是你没有用失败定义我，
-              你只是继续陪我往前走。
+              2021 年，第二次大考并不尽如人意。我没能去到最理想的地方，
+              只读上了成都温江东辰外国语学校。可是你没有用一次结果定义我，
+              你还是相信我。
             </p>
 
             <p>
-              2024 年，高考失利。我知道那不是一个让人轻松接受的结果。
-              但你还是相信我，还是愿意把未来交到我手里，
-              把我送到了马来西亚亚太科技大学。
+              2024 年，高考失利。那一次我知道自己让你担心了。
+              可你依旧相信我，依旧愿意把我送到马来西亚亚太科技大学，
+              让我去更远的地方重新开始。
             </p>
 
-            <div class="quote">
-              妈妈，谢谢你。<br />
-              谢谢你在我不够耀眼的时候，依旧相信我会有光。
+            <p>
+              现在，我在备考，在准备实习，在做很多很多项目。
+              我知道以前有些东西我没有得到，有些机会我没有抓住，
+              有些结果不够漂亮。
+            </p>
+
+            <div class="promise">
+              但是妈妈，我一定会努力。<br />
+              以前没得到的东西，我会一点一点争取回来。<br />
+              不是为了证明我从来不会失败，而是为了证明：你相信的我，真的值得。
             </div>
           </div>
         </div>
       </section>
     </main>
 
-    <button class="flower-btn" id="flowerBtn">送妈妈一朵花 🌸</button>
+    <button class="flower-btn" id="flowerBtn" type="button">送妈妈一朵玫瑰 🌹</button>
 
     <footer>
-      母亲节快乐。<br />
-      愿以后的每一次远行，都能成为让你放心的答案。<br />
+      妈妈，母亲节快乐。<br />
+      愿我以后的每一次努力，都能慢慢变成让你安心的答案。<br />
       Made with love by 王鸿.
     </footer>
+  </div>
+
+  <div class="love-modal" id="loveModal">
+    <div class="love-box">
+      <div class="big">🌹</div>
+      <h2>妈妈，我爱你</h2>
+      <p>
+        这句话平时可能不好意思说出口，<br />
+        但今天我想认真告诉你：<br />
+        谢谢你把我带到这个世界，也谢谢你一直相信我。
+      </p>
+      <button class="close-modal" id="closeModal" type="button">妈妈会收到的 ❤</button>
+    </div>
   </div>
 
   <script>
@@ -697,7 +922,7 @@
         lat: 30.5088,
         lng: 105.5735,
         story:
-          "2006 年，你把我带到这个世界上。从那一刻开始，我的人生就有了第一个坐标：妈妈在的地方。",
+          "2006 年，你把我带到这个世界上。从那一刻开始，我的人生有了第一个坐标：妈妈在的地方。",
       },
       {
         year: "2012",
@@ -710,12 +935,12 @@
       },
       {
         year: "2018",
-        title: "第一次决定命运的考试",
+        title: "第一次决定命运的时刻",
         place: "成都市龙泉驿区 · 师大一中龙泉校区",
         lat: 30.5992,
         lng: 104.3136,
         story:
-          "2018 年，我想考成绵的高中。你支持我、相信我，最后我考上了师大一中龙泉校区。那一次，我知道梦想被家人认真对待，是很幸福的事。",
+          "2018 年，我想考成绵的高中。你支持我、相信我，最后我考上了师大一中龙泉校区。那一次我知道，梦想被家人认真对待，是很幸福的事。",
       },
       {
         year: "2021",
@@ -733,63 +958,122 @@
         lat: 3.0556,
         lng: 101.7009,
         story:
-          "2024 年，高考失利。可是你依旧坚定地相信我，把我送到了马来西亚亚太科技大学。那一刻我明白，失败不是终点，因为你还愿意陪我重新开始。",
+          "2024 年，高考失利。可是你依旧坚定相信我，把我送到了马来西亚亚太科技大学。那一刻我明白，失败不是终点，因为你还愿意陪我重新开始。",
+      },
+      {
+        year: "现在",
+        title: "我在把失去的东西争取回来",
+        place: "备考 · 准备实习 · 做项目 · 继续往前走",
+        lat: 3.0556,
+        lng: 101.7009,
+        story:
+          "现在，我在备考，在准备实习，也在做很多项目。以前没得到的东西，我一定会努力争取回来。妈妈，你的相信不会白费。",
+        isNow: true,
       },
     ];
 
-    const map = L.map("map", {
+    function createRoseRain() {
+      const container = document.getElementById("roseRain");
+      const roses = ["🌹", "🌸", "🌷", "💮"];
+      const amount = window.innerWidth < 600 ? 18 : 30;
+
+      for (let i = 0; i < amount; i++) {
+        const rose = document.createElement("span");
+        rose.className = "rose-fall";
+        rose.textContent = roses[Math.floor(Math.random() * roses.length)];
+        rose.style.left = `${Math.random() * 100}%`;
+        rose.style.animationDuration = `${9 + Math.random() * 12}s`;
+        rose.style.animationDelay = `${Math.random() * 10}s`;
+        rose.style.fontSize = `${16 + Math.random() * 16}px`;
+        rose.style.setProperty("--drift", `${-40 + Math.random() * 80}px`);
+        container.appendChild(rose);
+      }
+    }
+
+    createRoseRain();
+
+    const tree = document.getElementById("tree");
+
+    journeyPoints.forEach((point, index) => {
+      const side = index % 2 === 0 ? "left" : "right";
+      const branch = document.createElement("article");
+      branch.className = `branch ${side}`;
+
+      branch.innerHTML = `
+        <div class="branch-node">${point.year}</div>
+
+        <div class="branch-card ${point.isNow ? "now-card" : ""}" data-index="${index}">
+          <div class="card-content">
+            <span class="year-tag">${point.year}</span>
+            <h3>${point.title}</h3>
+            <p>${point.story}</p>
+            <div class="place">📍 ${point.place}</div>
+          </div>
+          <div class="mini-map" id="miniMap-${index}"></div>
+        </div>
+      `;
+
+      tree.appendChild(branch);
+    });
+
+    const mainMap = L.map("mainMap", {
       zoomControl: false,
       scrollWheelZoom: false,
+      dragging: true,
+      tap: true,
     });
 
     L.control.zoom({
       position: "bottomright",
-    }).addTo(map);
+    }).addTo(mainMap);
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors',
-    }).addTo(map);
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(mainMap);
 
     const bounds = L.latLngBounds(journeyPoints.map(point => [point.lat, point.lng]));
-    map.fitBounds(bounds, {
+
+    mainMap.fitBounds(bounds, {
       padding: [42, 42],
     });
 
-    const line = L.polyline(
+    L.polyline(
       journeyPoints.map(point => [point.lat, point.lng]),
       {
         color: "#ff4f87",
         weight: 4,
-        opacity: 0.82,
+        opacity: 0.78,
         dashArray: "8, 10",
       }
-    ).addTo(map);
-
-    const markers = [];
+    ).addTo(mainMap);
 
     const heartIcon = L.divIcon({
-      html: `<div style="
-        width:34px;
-        height:34px;
-        border-radius:50%;
-        display:grid;
-        place-items:center;
-        background:linear-gradient(135deg,#ff4f87,#ffad66);
-        color:white;
-        box-shadow:0 12px 28px rgba(255,79,135,.35);
-        border:3px solid rgba(255,255,255,.9);
-        font-size:16px;
-      ">❤</div>`,
+      html: `
+        <div style="
+          width:34px;
+          height:34px;
+          border-radius:50%;
+          display:grid;
+          place-items:center;
+          color:white;
+          background:linear-gradient(135deg,#ff4f87,#ffad66);
+          box-shadow:0 12px 28px rgba(255,79,135,.35);
+          border:3px solid rgba(255,255,255,.92);
+          font-size:16px;
+        ">❤</div>
+      `,
       className: "",
       iconSize: [34, 34],
       iconAnchor: [17, 17],
     });
 
+    const markers = [];
+
     journeyPoints.forEach((point, index) => {
       const marker = L.marker([point.lat, point.lng], {
         icon: heartIcon,
-      }).addTo(map);
+      }).addTo(mainMap);
 
       marker.bindPopup(`
         <div class="popup-title">${point.year} · ${point.title}</div>
@@ -802,25 +1086,37 @@
       markers.push(marker);
     });
 
-    const timeline = document.getElementById("timeline");
+    const miniMaps = [];
 
     journeyPoints.forEach((point, index) => {
-      const item = document.createElement("article");
-      item.className = "moment";
-      item.innerHTML = `
-        <div class="dot">${point.year}</div>
-        <div class="moment-card" data-index="${index}">
-          <span class="year">${point.year}</span>
-          <h3>${point.title}</h3>
-          <p>${point.story}</p>
-          <div class="place">📍 ${point.place}</div>
-        </div>
-      `;
+      const mini = L.map(`miniMap-${index}`, {
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false,
+        dragging: false,
+        doubleClickZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        tap: false,
+      }).setView([point.lat, point.lng], point.isNow ? 7 : 13);
 
-      timeline.appendChild(item);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+      }).addTo(mini);
+
+      L.marker([point.lat, point.lng], {
+        icon: heartIcon,
+      }).addTo(mini);
+
+      miniMaps.push(mini);
     });
 
-    const cards = document.querySelectorAll(".moment-card");
+    setTimeout(() => {
+      mainMap.invalidateSize();
+      miniMaps.forEach(map => map.invalidateSize());
+    }, 500);
+
+    const cards = document.querySelectorAll(".branch-card");
 
     function focusPoint(index) {
       const point = journeyPoints[index];
@@ -828,43 +1124,100 @@
       cards.forEach(card => card.classList.remove("active"));
       cards[index].classList.add("active");
 
-      map.flyTo([point.lat, point.lng], index === 4 ? 7 : 13, {
+      mainMap.flyTo([point.lat, point.lng], point.isNow ? 7 : 13, {
         duration: 1.1,
       });
 
       setTimeout(() => {
         markers[index].openPopup();
-      }, 800);
+      }, 750);
     }
 
     cards.forEach(card => {
-      card.addEventListener("click", () => {
+      card.addEventListener("click", event => {
         const index = Number(card.dataset.index);
         focusPoint(index);
-        document.getElementById("map-section").scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
       });
     });
 
     setTimeout(() => {
       focusPoint(0);
-    }, 700);
+    }, 800);
 
     const flowerBtn = document.getElementById("flowerBtn");
 
-    flowerBtn.addEventListener("click", () => {
-      const flowers = ["🌸", "🌷", "🌹", "💐", "🌺"];
+    function popFlower(x, y) {
+      const flowers = ["🌹", "🌸", "🌷", "💐", "🌺"];
       const flower = document.createElement("div");
       flower.className = "flower-pop";
       flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
-      flower.style.right = `${18 + Math.random() * 80}px`;
+      flower.style.left = `${x}px`;
+      flower.style.top = `${y}px`;
       document.body.appendChild(flower);
 
       setTimeout(() => {
         flower.remove();
-      }, 1500);
+      }, 1600);
+    }
+
+    flowerBtn.addEventListener("click", event => {
+      event.stopPropagation();
+      const rect = flowerBtn.getBoundingClientRect();
+      popFlower(rect.left + rect.width / 2 - 16, rect.top - 10);
+    });
+
+    const loveModal = document.getElementById("loveModal");
+    const closeModal = document.getElementById("closeModal");
+    const secretHint = document.getElementById("secretHint");
+
+    function showLoveModal() {
+      loveModal.classList.add("show");
+    }
+
+    function hideLoveModal() {
+      loveModal.classList.remove("show");
+    }
+
+    closeModal.addEventListener("click", event => {
+      event.stopPropagation();
+      hideLoveModal();
+    });
+
+    loveModal.addEventListener("click", event => {
+      if (event.target === loveModal) {
+        hideLoveModal();
+      }
+    });
+
+    secretHint.addEventListener("click", event => {
+      event.stopPropagation();
+      showLoveModal();
+    });
+
+    let tapCount = 0;
+    let tapTimer = null;
+
+    document.addEventListener("click", event => {
+      const ignored = event.target.closest(".leaflet-container, .flower-btn, .love-box, button, a");
+      if (ignored) return;
+
+      tapCount += 1;
+
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => {
+        tapCount = 0;
+      }, 900);
+
+      if (tapCount >= 3) {
+        tapCount = 0;
+        clearTimeout(tapTimer);
+        showLoveModal();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      mainMap.invalidateSize();
+      miniMaps.forEach(map => map.invalidateSize());
     });
   </script>
 </body>
